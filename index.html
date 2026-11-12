@@ -39,5 +39,70 @@
     <!-- The root element for your Expo app. -->
     <div id="root"></div>
   <script src="/hola-spanish/__expo-metro-runtime-8c088df87a31e4e6accd81c554ec290d.js" defer></script><script src="/hola-spanish/__common-fda77b5a763e284232609b90747f1dca.js" defer></script><script src="/hola-spanish/entry-8f5ee92a4085fb55306e7d562a09cfa7.js" defer></script>
+<style>
+  #hs-install{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:9999;display:none;align-items:center;gap:8px;font-family:'IBM Plex Sans Arabic',system-ui,-apple-system,sans-serif;direction:rtl}
+  #hs-install button{border:0;cursor:pointer;font:inherit}
+  #hs-install .go{background:#D9483B;color:#fff;font-size:15px;font-weight:600;padding:12px 20px;border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;align-items:center;gap:8px}
+  #hs-install .x{width:34px;height:34px;border-radius:50%;background:rgba(30,21,39,.85);color:#fff;font-size:18px;line-height:34px}
+  #hs-sheet{position:fixed;inset:0;z-index:10000;display:none;background:rgba(20,14,25,.55);direction:rtl;font-family:'IBM Plex Sans Arabic',system-ui,-apple-system,sans-serif}
+  #hs-sheet .card{position:absolute;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));background:#fff;color:#1D1724;border-radius:24px;padding:22px 20px 18px;box-shadow:0 20px 50px rgba(0,0,0,.35);max-width:460px;margin:0 auto}
+  #hs-sheet h3{margin:0 0 4px;font-size:20px}
+  #hs-sheet p{margin:0 0 14px;color:#6E6577;font-size:14px;line-height:1.6}
+  #hs-sheet ol{margin:0;padding:0;list-style:none;display:grid;gap:12px}
+  #hs-sheet li{display:flex;align-items:center;gap:12px;font-size:16px;line-height:1.5}
+  #hs-sheet .n{flex:none;width:30px;height:30px;border-radius:50%;background:#F9E3DF;color:#D9483B;font-weight:700;display:grid;place-items:center}
+  #hs-sheet .ico{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#F0EAE3;vertical-align:middle;margin:0 4px}
+  #hs-sheet .ok{margin-top:18px;width:100%;border:0;border-radius:999px;background:#1E1527;color:#fff;font:inherit;font-size:16px;font-weight:600;padding:13px}
+  #hs-sheet .arrow{position:absolute;left:50%;transform:translateX(-50%);bottom:-26px;font-size:30px;color:#fff;animation:hsb 1s ease-in-out infinite}
+  @keyframes hsb{50%{transform:translate(-50%,6px)}}
+  @media (prefers-color-scheme:dark){#hs-sheet .card{background:#1E1826;color:#F4EFEA}#hs-sheet p{color:#A79DB0}#hs-sheet .ico{background:#2A2233}#hs-sheet .ok{background:#F0604F}}
+</style>
+<div id="hs-install" role="region" aria-label="نزّل الأبلكيشن">
+  <button class="go" type="button" id="hs-go">📲 نزّل الأبلكيشن</button>
+  <button class="x" type="button" id="hs-x" aria-label="اقفل">×</button>
+</div>
+<div id="hs-sheet" role="dialog" aria-modal="true" aria-labelledby="hs-t">
+  <div class="card">
+    <h3 id="hs-t">نزّل Hola Spanish على الآيفون</h3>
+    <p id="hs-sub">آبل مش بتسمح للمواقع تنزّل نفسها، بس الموضوع ٣ ثواني:</p>
+    <ol id="hs-steps">
+      <li><span class="n">١</span><span>دوس على زرار المشاركة <span class="ico"><svg width="16" height="18" viewBox="0 0 16 18" fill="none" stroke="#0A84FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 11V1M4.5 4.5 8 1l3.5 3.5"/><path d="M5 7H3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1h-2"/></svg></span> اللي تحت</span></li>
+      <li><span class="n">٢</span><span>انزل واختار <b>Add to Home Screen</b> <span class="ico"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="1.5" width="13" height="13" rx="3"/><path d="M8 5v6M5 8h6"/></svg></span></span></li>
+      <li><span class="n">٣</span><span>دوس <b>Add</b>، وهتلاقي ليو على الشاشة الرئيسية 🎉</span></li>
+    </ol>
+    <button class="ok" type="button" id="hs-ok">تمام</button>
+    <div class="arrow" id="hs-arrow" aria-hidden="true">⬇</div>
+  </div>
+</div>
+<script>
+(function () {
+  var standalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (standalone) return;
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPhone|iPad|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var inApp = /FBAN|FBAV|Instagram|Line\/|WhatsApp|Snapchat|TikTok/i.test(ua);
+  var isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
+  var deferred = null;
+  var bar = document.getElementById('hs-install');
+  var sheet = document.getElementById('hs-sheet');
+  function dismissed() { try { return sessionStorage.getItem('hs-install-x') === '1'; } catch (e) { return false; } }
+  function show() { if (!dismissed()) bar.style.display = 'flex'; }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; show(); });
+  window.addEventListener('appinstalled', function () { bar.style.display = 'none'; });
+  if (isIOS) setTimeout(show, 1500);
+  document.getElementById('hs-x').onclick = function () { bar.style.display = 'none'; try { sessionStorage.setItem('hs-install-x', '1'); } catch (e) {} };
+  document.getElementById('hs-go').onclick = function () {
+    if (deferred) { deferred.prompt(); deferred.userChoice.then(function () { deferred = null; bar.style.display = 'none'; }); return; }
+    if (inApp || (isIOS && !isSafari && !/CriOS/.test(ua))) {
+      document.getElementById('hs-sub').textContent = 'افتح الرابط ده في Safari الأول (من زرار ⋯ اختار Open in Safari)، وبعدين:';
+    }
+    if (/CriOS/.test(ua)) document.getElementById('hs-arrow').style.display = 'none';
+    sheet.style.display = 'block';
+  };
+  document.getElementById('hs-ok').onclick = function () { sheet.style.display = 'none'; };
+  sheet.onclick = function (e) { if (e.target === sheet) sheet.style.display = 'none'; };
+})();
+</script>
+
 </body>
 </html>
