@@ -1,0 +1,23 @@
+{
+  "name": "Hola Spanish",
+  "short_name": "Hola",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/hola-spanish/",
+  "scope": "/hola-spanish/",
+  "display": "standalone",
+  "background_color": "#F7F3EE",
+  "theme_color": "#1E1527",
+  "icons": [
+    {
+      "src": "/hola-spanish/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/hola-spanish/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
